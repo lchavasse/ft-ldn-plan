@@ -8,10 +8,11 @@ interface Props {
   activeId: string
   onSelect: (id: string) => void
   onNew: () => void
+  onDuplicate: () => void
   onRename: (id: string, name: string) => void
 }
 
-export default function ScenarioSelector({ scenarios, activeId, onSelect, onNew, onRename }: Props) {
+export default function ScenarioSelector({ scenarios, activeId, onSelect, onNew, onDuplicate, onRename }: Props) {
   const [editing, setEditing] = useState<string | null>(null)
   const [editValue, setEditValue] = useState('')
   const active = scenarios.find((s) => s.id === activeId)
@@ -54,17 +55,25 @@ export default function ScenarioSelector({ scenarios, activeId, onSelect, onNew,
       >
         ✎
       </button>
-      <button
-        onClick={onNew}
-        className="text-white transition-colors"
-        style={{
-          fontSize: 11, fontWeight: 600, letterSpacing: '0.04em',
-          background: '#2a2a28', border: '1px solid #3a3a38',
-          borderRadius: 5, padding: '3px 10px',
-        }}
-      >
-        + New
-      </button>
+      <div className="flex items-center" style={{ border: '1px solid #3a3a38', borderRadius: 5, overflow: 'hidden' }}>
+        <button
+          onClick={onDuplicate}
+          className="text-white transition-colors hover:bg-stone-700"
+          style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.04em', background: '#2a2a28', padding: '3px 10px' }}
+          title="Duplicate current scenario"
+        >
+          + New
+        </button>
+        <div style={{ width: 1, background: '#3a3a38', alignSelf: 'stretch' }} />
+        <button
+          onClick={onNew}
+          className="text-stone-400 hover:text-white hover:bg-stone-700 transition-colors"
+          style={{ fontSize: 11, fontWeight: 600, background: '#2a2a28', padding: '3px 7px' }}
+          title="New blank scenario"
+        >
+          ∅
+        </button>
+      </div>
     </div>
   )
 }

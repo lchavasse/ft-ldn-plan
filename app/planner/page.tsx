@@ -215,6 +215,20 @@ export default function PlannerPage() {
     setActiveScenarioId(newId)
   }, [scenarios, activeScenario, saveScenarios])
 
+  const handleDuplicateScenario = useCallback(() => {
+    if (!activeScenario) return
+    const newId = `scenario-${Date.now()}`
+    const newScenario: Scenario = {
+      ...activeScenario,
+      id: newId,
+      name: `${activeScenario.name} (copy)`,
+      createdAt: new Date().toISOString(),
+      allocations: activeScenario.allocations.map((a) => ({ ...a })),
+    }
+    saveScenarios([...scenarios, newScenario])
+    setActiveScenarioId(newId)
+  }, [scenarios, activeScenario, saveScenarios])
+
   const handleRenameScenario = useCallback(
     (id: string, name: string) => {
       saveScenarios(scenarios.map((s) => (s.id === id ? { ...s, name } : s)))
@@ -260,6 +274,7 @@ export default function PlannerPage() {
             activeId={activeScenarioId}
             onSelect={setActiveScenarioId}
             onNew={handleNewScenario}
+            onDuplicate={handleDuplicateScenario}
             onRename={handleRenameScenario}
           />
         </div>
