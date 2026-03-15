@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useRef, useEffect, useCallback } from 'react'
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import {
   Building, Scenario, ZoneAllocation, UseType, ZoneStatus,
   USE_TYPE_LABELS, USE_TYPE_COLORS, ZONE_STATUS_CONFIG,
@@ -24,6 +24,7 @@ interface Row {
   status: string | undefined
   letPercentage: number | undefined
   rentPerSqft: number | undefined
+  ratesInclusive: boolean | undefined
   memberCount: number | undefined
   councilTaxPerSqft: number | undefined
   energyCost: number | undefined
@@ -33,6 +34,7 @@ interface Row {
   commercialCost: number   // energy only (commercial zones)
   communityCost: number    // rates + energy (community / shared / lab / charitable zones)
   charitableRates: number  // rates portion of charitable zones — potentially reducible
+  outOfUseRates: number    // rates that would apply if out-of-use space were renovated
 }
 
 type SortKey = keyof Row
@@ -266,6 +268,7 @@ export default function TableView({ building, scenario, onUpdate, onUpdateScenar
           status: alloc?.status,
           letPercentage: alloc?.letPercentage,
           rentPerSqft: alloc?.rentPerSqft,
+          ratesInclusive: alloc?.ratesInclusive,
           memberCount: alloc?.memberCount,
           councilTaxPerSqft: alloc?.councilTaxPerSqft,
           energyCost: alloc?.energyCost,
@@ -275,6 +278,8 @@ export default function TableView({ building, scenario, onUpdate, onUpdateScenar
           commercialCost:  (alloc && useType === 'commercial') ? calcAnnualCost(alloc, zone.sqft) : 0,
           communityCost:   (alloc && useType !== 'commercial' && useType !== 'unassigned') ? calcAnnualCost(alloc, zone.sqft) : 0,
           charitableRates: alloc ? calcCharitableRates(alloc, zone.sqft) : 0,
+          outOfUseRates: (alloc?.status === 'out-of-use' && zone.sqft && useType !== 'unassigned')
+            ? (alloc.councilTaxPerSqft ?? 22) * zone.sqft : 0,
         })
       }
     }
@@ -371,6 +376,7 @@ export default function TableView({ building, scenario, onUpdate, onUpdateScenar
     vacantRates: sorted.reduce((s, r) => s + r.vacantRates, 0),
     communityCost: sorted.reduce((s, r) => s + r.communityCost, 0),
     charitableRates: sorted.reduce((s, r) => s + r.charitableRates, 0),
+    outOfUseRates: sorted.reduce((s, r) => s + r.outOfUseRates, 0),
   }), [sorted, scenario.miscRevenue, scenario.miscCost])
 
   const thCls = 'px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-wider text-white cursor-pointer select-none hover:bg-white/10 transition-colors whitespace-nowrap'
@@ -493,15 +499,20 @@ export default function TableView({ building, scenario, onUpdate, onUpdateScenar
       {/* Rent — editable, commercial only */}
       <td className={tdNumCls}>
         {row.useType === 'commercial' ? (
-          <NumCell
-            value={rateConvert(row.rentPerSqft, unit)}
-            zoneId={row.zoneId}
-            field="rentPerSqft"
-            editing={isEditing(row.zoneId, 'rentPerSqft')}
-            onStartEdit={() => startEdit(row.zoneId, 'rentPerSqft')}
-            onCommit={(v) => commit(row, 'rentPerSqft', rateRevert(v, unit))}
-            onCancel={cancelEdit}
-          />
+          <span title={row.ratesInclusive ? 'Inclusive of rates' : undefined}>
+            <NumCell
+              value={rateConvert(row.rentPerSqft, unit)}
+              zoneId={row.zoneId}
+              field="rentPerSqft"
+              editing={isEditing(row.zoneId, 'rentPerSqft')}
+              onStartEdit={() => startEdit(row.zoneId, 'rentPerSqft')}
+              onCommit={(v) => commit(row, 'rentPerSqft', rateRevert(v, unit))}
+              onCancel={cancelEdit}
+            />
+            {row.ratesInclusive && (
+              <div className="text-[10px] font-normal" style={{ color: '#a8a29e' }}>incl. rates</div>
+            )}
+          </span>
         ) : <span className="text-stone-200">—</span>}
       </td>
 
@@ -552,7 +563,12 @@ export default function TableView({ building, scenario, onUpdate, onUpdateScenar
       </td>
 
       {/* Annual Revenue — calculated */}
-      <td className={tdNumCls + ' font-medium text-stone-900'}>{row.annualRevenue > 0 ? fmt(row.annualRevenue) : '—'}</td>
+      <td className={tdNumCls + ' font-medium text-stone-900'}>
+        {row.annualRevenue > 0 ? fmt(row.annualRevenue) : '—'}
+        {row.ratesInclusive && row.annualRevenue > 0 && (
+          <div className="text-[10px] font-normal" style={{ color: '#a8a29e' }}>rates deducted</div>
+        )}
+      </td>
 
       {/* Potential Revenue — calculated */}
       <td className={tdNumCls}>
@@ -569,11 +585,21 @@ export default function TableView({ building, scenario, onUpdate, onUpdateScenar
             (+{fmt(row.vacantRates)} rates)
           </div>
         )}
+        {row.outOfUseRates > 0 && row.useType === 'commercial' && (
+          <div className="text-[10px] font-normal" style={{ color: '#6b7280' }}>
+            {fmt(row.outOfUseRates)}/yr if renovated
+          </div>
+        )}
       </td>
 
       {/* Community / Shared Cost — rates + energy */}
       <td className={tdNumCls + ' font-medium text-stone-900'}>
         {row.communityCost > 0 ? fmt(row.communityCost) : row.useType !== 'commercial' && row.useType !== 'unassigned' ? '—' : ''}
+        {row.outOfUseRates > 0 && row.useType !== 'commercial' && (
+          <div className="text-[10px] font-normal" style={{ color: '#6b7280' }}>
+            {fmt(row.outOfUseRates)}/yr if renovated
+          </div>
+        )}
       </td>
     </tr>
   )
@@ -586,6 +612,9 @@ export default function TableView({ building, scenario, onUpdate, onUpdateScenar
     const vacantRatesTotal = rows.reduce((s, r) => s + r.vacantRates, 0)
     const communityTotal = rows.reduce((s, r) => s + r.communityCost, 0)
     const charitableTotal = rows.reduce((s, r) => s + r.charitableRates, 0)
+    const outOfUseRatesTotal = rows.reduce((s, r) => s + r.outOfUseRates, 0)
+    const commOOURates = rows.reduce((s, r) => s + (r.useType === 'commercial' ? r.outOfUseRates : 0), 0)
+    const nonCommOOURates = outOfUseRatesTotal - commOOURates
     return (
       <tr style={{ background: '#f0efe9', borderTop: '1px solid #e7e3dc', borderBottom: '1px solid #e7e3dc' }}>
         <td className={tdCls + ' font-semibold text-stone-600'} colSpan={2}>Subtotal</td>
@@ -602,12 +631,22 @@ export default function TableView({ building, scenario, onUpdate, onUpdateScenar
               (+{fmt(vacantRatesTotal)} rates)
             </div>
           )}
+          {commOOURates > 0 && (
+            <div className="text-[10px] font-normal" style={{ color: '#6b7280' }}>
+              +{fmt(commOOURates)} if renovated
+            </div>
+          )}
         </td>
         <td className={tdNumCls + ' font-semibold text-stone-700'}>
           {communityTotal > 0 ? fmt(communityTotal) : '—'}
           {charitableTotal > 0 && (
             <div className="text-[10px] font-normal" style={{ color: '#15803d' }}>
               inc. {fmt(charitableTotal)} charitable rates
+            </div>
+          )}
+          {nonCommOOURates > 0 && (
+            <div className="text-[10px] font-normal" style={{ color: '#6b7280' }}>
+              +{fmt(nonCommOOURates)} if renovated
             </div>
           )}
         </td>
@@ -741,7 +780,7 @@ export default function TableView({ building, scenario, onUpdate, onUpdateScenar
               <th className={thNumCls} onClick={() => handleSort('energyCost')}>Energy (£/yr) <SortIndicator col="energyCost" /></th>
               <th className={thNumCls} onClick={() => handleSort('annualRevenue')}>Annual Revenue <SortIndicator col="annualRevenue" /></th>
               <th className={thNumCls} onClick={() => handleSort('potentialRevenue')} style={{ color: '#fcd34d' }}>Potential Rev <SortIndicator col="potentialRevenue" /></th>
-              <th className={thNumCls} onClick={() => handleSort('commercialCost')} style={{ color: '#93c5fd' }}>Commercial Cost <SortIndicator col="commercialCost" /></th>
+              <th className={thNumCls} onClick={() => handleSort('commercialCost')} style={{ color: '#93c5fd' }}>Commercial Cost <SortIndicator col="commercialCost" /><div className="text-[9px] font-normal normal-case tracking-normal" style={{ color: '#93c5fd', opacity: 0.7 }}>(brackets = rates when vacant)</div></th>
               <th className={thNumCls} onClick={() => handleSort('communityCost')} style={{ color: '#fca5a5' }}>Community Cost <SortIndicator col="communityCost" /></th>
             </tr>
           </thead>
@@ -750,15 +789,15 @@ export default function TableView({ building, scenario, onUpdate, onUpdateScenar
               sorted.map((row, i) => renderRow(row, i))
             ) : (
               grouped.map(({ floorLabel, rows: floorRows }) => (
-                <>
-                  <tr key={`floor-${floorLabel}`} style={{ background: '#f0efe9' }}>
+                <React.Fragment key={`floor-${floorLabel}`}>
+                  <tr style={{ background: '#f0efe9' }}>
                     <td className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-stone-500" colSpan={13}>
                       {floorLabel}
                     </td>
                   </tr>
                   {floorRows.map((row, i) => renderRow(row, i))}
                   {renderSubtotalRow(floorRows)}
-                </>
+                </React.Fragment>
               ))
             )}
             {/* Miscellaneous row */}
@@ -820,6 +859,17 @@ export default function TableView({ building, scenario, onUpdate, onUpdateScenar
                 )}
               </td>
             </tr>
+            {grandTotals.outOfUseRates > 0 && (
+            <tr style={{ background: '#e8e6e0' }}>
+              <td className={tdCls + ' text-stone-500 text-[10px] italic'} colSpan={9}>
+                Out-of-use rates if renovated
+              </td>
+              <td colSpan={2} />
+              <td className={tdNumCls + ' text-[11px] italic'} style={{ color: '#6b7280' }} colSpan={2}>
+                +{fmt(grandTotals.outOfUseRates)}/yr in out-of-use rates
+              </td>
+            </tr>
+            )}
           </tbody>
         </table>
       </div>

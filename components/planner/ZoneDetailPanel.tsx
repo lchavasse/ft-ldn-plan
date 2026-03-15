@@ -294,6 +294,15 @@ export default function ZoneDetailPanel({ zone, allocation, onUpdate, onDelete, 
               key={zone.id + '-rent'}
               onBlur={(e) => onUpdate({ rentPerSqft: e.target.value ? Number(e.target.value) : undefined })}
             />
+            <label className="flex items-center gap-2 mt-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                className="w-3.5 h-3.5 accent-stone-700 cursor-pointer"
+                checked={allocation?.ratesInclusive ?? false}
+                onChange={(e) => onUpdate({ ratesInclusive: e.target.checked })}
+              />
+              <span className="text-[11px] text-stone-500">Rent inclusive of rates</span>
+            </label>
           </div>
         )}
 

@@ -111,6 +111,7 @@ export interface ZoneAllocation {
   teams?: string[]           // commercial only
   sectors?: string[]         // community only
   rentPerSqft?: number       // £/sqft/year — commercial only
+  ratesInclusive?: boolean   // commercial only — lease includes rates; rates deducted from revenue
   memberCount?: number       // community only — each member generates £100/month
   councilTaxPerSqft?: number // £/sqft/year — pre-filled to 22
   energyCost?: number        // £/year — default 0
@@ -133,7 +134,8 @@ export function calcAnnualRevenue(a: ZoneAllocation, sqft: number | undefined): 
   const status = a.status
   if (a.useType === 'commercial') {
     if (!a.rentPerSqft) return 0
-    const base = a.rentPerSqft * sqft
+    const ratesDeduction = a.ratesInclusive ? (a.councilTaxPerSqft ?? 22) * sqft : 0
+    const base = a.rentPerSqft * sqft - ratesDeduction
     if (status === 'let') return base
     if (status === 'partially-let') return base * ((a.letPercentage ?? 0) / 100)
     return 0

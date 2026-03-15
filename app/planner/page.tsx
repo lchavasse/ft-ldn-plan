@@ -85,7 +85,7 @@ export default function PlannerPage() {
       const allocationKeys: (keyof ZoneAllocation)[] = [
         'useType', 'color', 'status', 'letPercentage',
         'teams', 'sectors',
-        'rentPerSqft', 'memberCount',
+        'rentPerSqft', 'ratesInclusive', 'memberCount',
         'councilTaxPerSqft', 'energyCost', 'notes',
       ]
       const hasAllocationUpdate = allocationKeys.some((k) => k in updates)
@@ -105,6 +105,7 @@ export default function PlannerPage() {
           teams: updates.teams ?? existing?.teams ?? [],
           sectors: updates.sectors ?? existing?.sectors ?? [],
           rentPerSqft: updates.rentPerSqft ?? existing?.rentPerSqft,
+          ratesInclusive: updates.ratesInclusive ?? existing?.ratesInclusive,
           memberCount: updates.memberCount ?? existing?.memberCount,
           councilTaxPerSqft: updates.councilTaxPerSqft ?? existing?.councilTaxPerSqft ?? 22,
           energyCost: updates.energyCost ?? existing?.energyCost ?? 0,
