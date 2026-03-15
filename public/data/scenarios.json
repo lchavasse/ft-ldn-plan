@@ -1,0 +1,821 @@
+[
+  {
+    "id": "scenario-a",
+    "name": "Scenario A",
+    "createdAt": "2026-03-13T00:00:00.000Z",
+    "allocations": [
+      {
+        "floorId": "ground",
+        "zoneId": "zone-ground-1773435053066",
+        "useType": "shared",
+        "color": "#64748b",
+        "status": "shared",
+        "teams": [],
+        "sectors": [],
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": "pop up"
+      },
+      {
+        "floorId": "ground",
+        "zoneId": "zone-ground-1773435242716",
+        "useType": "shared",
+        "color": "#64748b",
+        "status": "shared",
+        "teams": [],
+        "sectors": [],
+        "councilTaxPerSqft": 10,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "first",
+        "zoneId": "zone-first-1773437218125",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "partially-let",
+        "letPercentage": 30,
+        "teams": [
+          "K&G Recruitment"
+        ],
+        "sectors": [],
+        "rentPerSqft": 42,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": "pop up?"
+      },
+      {
+        "floorId": "second",
+        "zoneId": "zone-second-1773437931221",
+        "useType": "shared",
+        "color": "#64748b",
+        "status": "shared",
+        "teams": [],
+        "sectors": [],
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "second",
+        "zoneId": "zone-second-1773438085484",
+        "useType": "community",
+        "color": "#dc2626",
+        "status": "vacant",
+        "teams": [],
+        "sectors": [],
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "second",
+        "zoneId": "zone-second-1773438184082",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "let",
+        "teams": [
+          "TFL"
+        ],
+        "sectors": [],
+        "rentPerSqft": 40,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "second",
+        "zoneId": "zone-second-1773438218149",
+        "useType": "shared",
+        "color": "#64748b",
+        "status": "shared",
+        "teams": [],
+        "sectors": [],
+        "councilTaxPerSqft": 10,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "second",
+        "zoneId": "zone-second-1773438240614",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "vacant",
+        "teams": [],
+        "sectors": [],
+        "rentPerSqft": 40,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "second",
+        "zoneId": "zone-second-1773438292431",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "vacant",
+        "teams": [],
+        "sectors": [],
+        "rentPerSqft": 50,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": "would need to be serviced"
+      },
+      {
+        "floorId": "second",
+        "zoneId": "zone-second-1773500001000",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "let",
+        "teams": [
+          "Al Quds"
+        ],
+        "sectors": [],
+        "rentPerSqft": 50,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "second",
+        "zoneId": "zone-second-1773500002000",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "vacant",
+        "teams": [],
+        "sectors": [],
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "second",
+        "zoneId": "zone-second-1773500003000",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "let",
+        "teams": [
+          "Noventiq"
+        ],
+        "sectors": [],
+        "rentPerSqft": 47,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "second",
+        "zoneId": "zone-second-1773500004000",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "let",
+        "teams": [
+          "Steele Rose"
+        ],
+        "sectors": [],
+        "rentPerSqft": 60,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "third",
+        "zoneId": "zone-third-1773438502046",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "let",
+        "teams": [
+          "TFL"
+        ],
+        "sectors": [],
+        "rentPerSqft": 40,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "fourth",
+        "zoneId": "zone-fourth-1773438502046",
+        "useType": "community",
+        "color": "#dc2626",
+        "status": "let",
+        "teams": [],
+        "sectors": [
+          "AI"
+        ],
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "fifth",
+        "zoneId": "zone-fifth-1773438502046",
+        "useType": "community",
+        "color": "#1d4ed8",
+        "status": "out-of-use",
+        "teams": [],
+        "sectors": [],
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "sixth",
+        "zoneId": "zone-sixth-1773438502046",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "let",
+        "teams": [
+          "Siemens"
+        ],
+        "sectors": [],
+        "rentPerSqft": 51,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "third",
+        "zoneId": "zone-third-1773438554968",
+        "useType": "community",
+        "color": "#dc2626",
+        "status": "vacant",
+        "teams": [],
+        "sectors": [],
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "fourth",
+        "zoneId": "zone-fourth-1773438554968",
+        "useType": "community",
+        "color": "#dc2626",
+        "status": "let",
+        "teams": [],
+        "sectors": [
+          "Robotics",
+          "Hardware",
+          "Space",
+          "Defence"
+        ],
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "fifth",
+        "zoneId": "zone-fifth-1773438554968",
+        "useType": "community",
+        "color": "#1d4ed8",
+        "status": "out-of-use",
+        "teams": [],
+        "sectors": [],
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "sixth",
+        "zoneId": "zone-sixth-1773438554968",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "let",
+        "teams": [
+          "Siemens"
+        ],
+        "sectors": [],
+        "rentPerSqft": 51,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "third",
+        "zoneId": "zone-third-1773438637346",
+        "useType": "lab",
+        "color": "#059669",
+        "status": "vacant",
+        "teams": [],
+        "sectors": [],
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "fourth",
+        "zoneId": "zone-fourth-1773438637346",
+        "useType": "lab",
+        "color": "#059669",
+        "status": "vacant",
+        "teams": [],
+        "sectors": [],
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": "Makerspace?"
+      },
+      {
+        "floorId": "fifth",
+        "zoneId": "zone-fifth-1773438637346",
+        "useType": "community",
+        "color": "#64748b",
+        "status": "out-of-use",
+        "teams": [],
+        "sectors": [],
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "third",
+        "zoneId": "zone-third-1773438688711",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "let",
+        "teams": [
+          "AGA Scaffolding"
+        ],
+        "sectors": [],
+        "rentPerSqft": 54,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "fourth",
+        "zoneId": "zone-fourth-1773438688711",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "let",
+        "teams": [
+          "Caria Holidays Ltd"
+        ],
+        "sectors": [],
+        "rentPerSqft": 30,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "fifth",
+        "zoneId": "zone-fifth-1773438688711",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "let",
+        "teams": [
+          "G2 Field Marketing"
+        ],
+        "sectors": [],
+        "rentPerSqft": 55,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "sixth",
+        "zoneId": "zone-sixth-1773438688711",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "vacant",
+        "teams": [],
+        "sectors": [],
+        "rentPerSqft": 40,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "third",
+        "zoneId": "zone-third-1773438719396",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "vacant",
+        "teams": [],
+        "sectors": [],
+        "rentPerSqft": 50,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "fourth",
+        "zoneId": "zone-fourth-1773438719396",
+        "useType": "shared",
+        "color": "#64748b",
+        "status": "shared",
+        "teams": [],
+        "sectors": [],
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": "kitchen / hangout"
+      },
+      {
+        "floorId": "fifth",
+        "zoneId": "zone-fifth-1773438719396",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "let",
+        "teams": [
+          "Sigma AI"
+        ],
+        "sectors": [],
+        "rentPerSqft": 54,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "sixth",
+        "zoneId": "zone-sixth-1773438719396",
+        "useType": "community",
+        "color": "#dc2626",
+        "status": "vacant",
+        "teams": [
+          "Flourishing"
+        ],
+        "sectors": [],
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "third",
+        "zoneId": "zone-third-1773438824644",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "vacant",
+        "teams": [],
+        "sectors": [],
+        "rentPerSqft": 50,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "fourth",
+        "zoneId": "zone-fourth-1773438824644",
+        "useType": "community",
+        "color": "#dc2626",
+        "status": "let",
+        "teams": [],
+        "sectors": [
+          "Biotech",
+          "NeuroTech"
+        ],
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": "needs refurb"
+      },
+      {
+        "floorId": "fifth",
+        "zoneId": "zone-fifth-1773500011000",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "let",
+        "teams": [
+          "Sigma AI"
+        ],
+        "sectors": [],
+        "rentPerSqft": 54,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "fifth",
+        "zoneId": "zone-fifth-1773500012000",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "vacant",
+        "teams": [
+          "Sigma AI"
+        ],
+        "sectors": [],
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "fifth",
+        "zoneId": "zone-fifth-1773500013000",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "vacant",
+        "teams": [],
+        "sectors": [],
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "fifth",
+        "zoneId": "zone-fifth-1773500014000",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "vacant",
+        "teams": [],
+        "sectors": [],
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "sixth",
+        "zoneId": "zone-sixth-1773438824644",
+        "useType": "community",
+        "color": "#dc2626",
+        "status": "refurb",
+        "teams": [],
+        "sectors": [
+          "Longevity",
+          "Flourishing"
+        ],
+        "rentPerSqft": 50,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": "this is the same as the 7th floor on the W side - has access to the roof maybe?\n\nGood for Health / Longevity / Flourishing maybe?"
+      },
+      {
+        "floorId": "third",
+        "zoneId": "zone-third-1773438894925",
+        "useType": "shared",
+        "color": "#64748b",
+        "teams": [],
+        "fundingModel": "",
+        "notes": ""
+      },
+      {
+        "floorId": "fourth",
+        "zoneId": "zone-fourth-1773438894925",
+        "useType": "shared",
+        "color": "#64748b",
+        "teams": [],
+        "fundingModel": "",
+        "notes": ""
+      },
+      {
+        "floorId": "fifth",
+        "zoneId": "zone-fifth-1773438894925",
+        "useType": "shared",
+        "color": "#64748b",
+        "teams": [],
+        "fundingModel": "",
+        "notes": ""
+      },
+      {
+        "floorId": "sixth",
+        "zoneId": "zone-sixth-1773438894925",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "let",
+        "teams": [
+          "Siemens"
+        ],
+        "sectors": [],
+        "rentPerSqft": 51,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "seventh",
+        "zoneId": "zone-seventh-1773439194357",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "vacant",
+        "teams": [],
+        "sectors": [],
+        "rentPerSqft": 50,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "seventh",
+        "zoneId": "zone-seventh-1773439141828",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "let",
+        "teams": [
+          "Sigma AI"
+        ],
+        "sectors": [],
+        "rentPerSqft": 57,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "eighth",
+        "zoneId": "zone-eighth-1773439301734",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "vacant",
+        "teams": [],
+        "sectors": [],
+        "rentPerSqft": 50,
+        "memberCount": 40,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "ninth",
+        "zoneId": "zone-ninth-1773439301734",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "vacant",
+        "teams": [],
+        "sectors": [],
+        "rentPerSqft": 50,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": "Coworking (focus work)"
+      },
+      {
+        "floorId": "tenth",
+        "zoneId": "zone-tenth-1773439301734",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "vacant",
+        "teams": [],
+        "sectors": [],
+        "rentPerSqft": 50,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "eleventh",
+        "zoneId": "zone-eleventh-1773439301734",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "let",
+        "teams": [
+          "Devere London"
+        ],
+        "sectors": [],
+        "rentPerSqft": 69,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "eighth",
+        "zoneId": "zone-eighth-1773439333250",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "vacant",
+        "teams": [],
+        "sectors": [],
+        "rentPerSqft": 50,
+        "memberCount": 20,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": "saunas..?"
+      },
+      {
+        "floorId": "ninth",
+        "zoneId": "zone-ninth-1773439333250",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "vacant",
+        "teams": [],
+        "sectors": [],
+        "rentPerSqft": 50,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": "meeting rooms"
+      },
+      {
+        "floorId": "tenth",
+        "zoneId": "zone-tenth-1773439333250",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "vacant",
+        "teams": [],
+        "sectors": [],
+        "rentPerSqft": 50,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "eleventh",
+        "zoneId": "zone-eleventh-1773439333250",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "let",
+        "teams": [
+          "Devere London"
+        ],
+        "sectors": [],
+        "rentPerSqft": 69,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "basement",
+        "zoneId": "zone-basement-1773439452615",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "let",
+        "teams": [],
+        "sectors": [],
+        "rentPerSqft": 17.5,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "ground",
+        "zoneId": "zone-ground-1773439488847",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "let",
+        "teams": [],
+        "sectors": [],
+        "councilTaxPerSqft": 0,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "ground",
+        "zoneId": "zone-ground-1773439535282",
+        "useType": "shared",
+        "color": "#64748b",
+        "teams": [],
+        "sectors": [],
+        "councilTaxPerSqft": 0,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "sixth",
+        "zoneId": "zone-sixth-1773450285681",
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "let",
+        "teams": [
+          "Siemens"
+        ],
+        "sectors": [],
+        "rentPerSqft": 25,
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "first",
+        "zoneId": "zone-first-1773437335628",
+        "useType": "shared",
+        "color": "#64748b",
+        "status": "shared",
+        "teams": [],
+        "sectors": [],
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": "FT offices?"
+      },
+      {
+        "floorId": "first",
+        "zoneId": "zone-first-1773437381324",
+        "useType": "shared",
+        "color": "#64748b",
+        "status": "shared",
+        "teams": [],
+        "sectors": [],
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": "FT / Coworking"
+      },
+      {
+        "floorId": "first",
+        "zoneId": "zone-first-1773437635023",
+        "useType": "unassigned",
+        "color": "transparent",
+        "status": "refurb",
+        "teams": [],
+        "sectors": [],
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      },
+      {
+        "floorId": "second",
+        "zoneId": "zone-second-1773437968987",
+        "useType": "shared",
+        "color": "transparent",
+        "status": "out-of-use",
+        "teams": [],
+        "sectors": [],
+        "councilTaxPerSqft": 22,
+        "energyCost": 0,
+        "notes": ""
+      }
+    ],
+    "miscRevenue": 156000,
+    "miscCost": 0
+  }
+]
