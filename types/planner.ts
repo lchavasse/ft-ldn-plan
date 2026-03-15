@@ -17,13 +17,14 @@ export interface Building {
   floors: Floor[]
 }
 
-export type UseType = 'commercial' | 'community' | 'shared' | 'lab' | 'unassigned'
+export type UseType = 'commercial' | 'community' | 'shared' | 'lab' | 'charitable' | 'unassigned'
 
 export const USE_TYPE_COLORS: Record<UseType, string> = {
   commercial: '#1d4ed8',
   community:  '#dc2626',
   shared:     '#64748b',
   lab:        '#059669',
+  charitable: '#15803d',
   unassigned: 'transparent',
 }
 
@@ -32,6 +33,7 @@ export const USE_TYPE_LABELS: Record<UseType, string> = {
   community:  'Community',
   shared:     'Shared',
   lab:        'Lab',
+  charitable: 'Charitable',
   unassigned: 'Unassigned',
 }
 
@@ -81,6 +83,12 @@ const STATUS_TINTS: Record<UseType, Partial<Record<ZoneStatus, string>>> = {
     'partially-let': '#10b981',  // medium green
     'vacant':        '#6ee7b7',  // light green
     'shared':        '#059669',
+  },
+  charitable: {
+    'let':           '#15803d',  // forest green
+    'partially-let': '#22c55e',  // medium green
+    'vacant':        '#86efac',  // light green
+    'shared':        '#15803d',
   },
   unassigned: {},
 }
@@ -153,8 +161,14 @@ export function calcAnnualCost(a: ZoneAllocation, sqft: number | undefined): num
     return energy
   }
 
-  // community, shared, lab — always pay rates
+  // community, shared, lab, charitable — always pay rates
   return ctRate * sqft + energy
+}
+
+// Business rates portion for charitable zones — shown as reducible sub-total
+export function calcCharitableRates(a: ZoneAllocation, sqft: number | undefined): number {
+  if (!sqft || a.useType !== 'charitable' || a.status === 'out-of-use') return 0
+  return (a.councilTaxPerSqft ?? 22) * sqft
 }
 
 // Revenue that could be earned if vacant portions were filled (commercial only)

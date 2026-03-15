@@ -3,7 +3,7 @@
 import { Zone, ZoneAllocation, UseType, ZoneStatus, USE_TYPE_COLORS, USE_TYPE_LABELS, ZONE_STATUS_CONFIG } from '@/types/planner'
 import { useState, useEffect } from 'react'
 
-const USE_TYPES: UseType[] = ['commercial', 'community', 'shared', 'lab', 'unassigned']
+const USE_TYPES: UseType[] = ['commercial', 'community', 'shared', 'lab', 'charitable', 'unassigned']
 const ZONE_STATUSES: ZoneStatus[] = ['let', 'partially-let', 'vacant', 'refurb', 'out-of-use', 'shared']
 
 interface Props {

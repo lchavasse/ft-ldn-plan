@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { UseType, USE_TYPE_COLORS, USE_TYPE_LABELS } from '@/types/planner'
 
-const USE_TYPES: UseType[] = ['commercial', 'community', 'shared', 'lab', 'unassigned']
+const USE_TYPES: UseType[] = ['commercial', 'community', 'shared', 'lab', 'charitable', 'unassigned']
 
 interface Props {
   onSave: (name: string, sqft: number | undefined, useType: UseType) => void

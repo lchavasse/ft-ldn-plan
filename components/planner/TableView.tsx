@@ -4,7 +4,7 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import {
   Building, Scenario, ZoneAllocation, UseType, ZoneStatus,
   USE_TYPE_LABELS, USE_TYPE_COLORS, ZONE_STATUS_CONFIG,
-  calcAnnualRevenue, calcAnnualCost, calcPotentialRevenue, calcVacantRates,
+  calcAnnualRevenue, calcAnnualCost, calcPotentialRevenue, calcVacantRates, calcCharitableRates,
 } from '@/types/planner'
 
 interface Props {
@@ -31,16 +31,28 @@ interface Row {
   potentialRevenue: number
   vacantRates: number
   commercialCost: number   // energy only (commercial zones)
-  communityCost: number    // rates + energy (community / shared / lab zones)
+  communityCost: number    // rates + energy (community / shared / lab / charitable zones)
+  charitableRates: number  // rates portion of charitable zones — potentially reducible
 }
 
 type SortKey = keyof Row
 type SortDir = 'asc' | 'desc'
 type EditingCell = { zoneId: string; field: string }
+type AreaUnit = 'sqft' | 'sqm'
+
+const SQFT_TO_SQM = 0.092903
+const areaConvert = (val: number | undefined, unit: AreaUnit): number | undefined =>
+  val !== undefined ? (unit === 'sqm' ? val * SQFT_TO_SQM : val) : undefined
+const rateConvert = (val: number | undefined, unit: AreaUnit): number | undefined =>
+  val !== undefined ? (unit === 'sqm' ? val / SQFT_TO_SQM : val) : undefined
+const areaRevert = (val: number | undefined, unit: AreaUnit): number | undefined =>
+  val !== undefined ? (unit === 'sqm' ? val / SQFT_TO_SQM : val) : undefined
+const rateRevert = (val: number | undefined, unit: AreaUnit): number | undefined =>
+  val !== undefined ? (unit === 'sqm' ? val * SQFT_TO_SQM : val) : undefined
 
 const USE_TYPES: UseType[] = ['commercial', 'community', 'shared', 'lab', 'unassigned']
 const ZONE_STATUSES: ZoneStatus[] = ['let', 'partially-let', 'vacant', 'refurb', 'out-of-use', 'shared']
-const USE_TYPE_FILTER_OPTIONS: (UseType | 'all')[] = ['all', 'commercial', 'community', 'shared', 'lab', 'unassigned']
+const USE_TYPE_FILTER_OPTIONS: (UseType | 'all')[] = ['all', 'commercial', 'community', 'shared', 'lab', 'charitable', 'unassigned']
 
 function fmt(val: number): string {
   if (val === 0) return '—'
@@ -217,6 +229,10 @@ export default function TableView({ building, scenario, onUpdate, onUpdateScenar
   const [sortKey, setSortKey] = useState<SortKey | null>(null)
   const [sortDir, setSortDir] = useState<SortDir>('asc')
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null)
+  const [unit, setUnit] = useState<AreaUnit>('sqft')
+
+  const unitLabel = unit === 'sqm' ? 'sq m' : 'sq ft'
+  const unitRateLabel = unit === 'sqm' ? 'sqm' : 'sqft'
 
   const isEditing = (zoneId: string, field: string) =>
     editingCell?.zoneId === zoneId && editingCell?.field === field
@@ -256,8 +272,9 @@ export default function TableView({ building, scenario, onUpdate, onUpdateScenar
           annualRevenue: alloc ? calcAnnualRevenue(alloc, zone.sqft) : 0,
           potentialRevenue: alloc ? calcPotentialRevenue(alloc, zone.sqft) : 0,
           vacantRates: alloc ? calcVacantRates(alloc, zone.sqft) : 0,
-          commercialCost: (alloc && useType === 'commercial') ? calcAnnualCost(alloc, zone.sqft) : 0,
-          communityCost:  (alloc && useType !== 'commercial' && useType !== 'unassigned') ? calcAnnualCost(alloc, zone.sqft) : 0,
+          commercialCost:  (alloc && useType === 'commercial') ? calcAnnualCost(alloc, zone.sqft) : 0,
+          communityCost:   (alloc && useType !== 'commercial' && useType !== 'unassigned') ? calcAnnualCost(alloc, zone.sqft) : 0,
+          charitableRates: alloc ? calcCharitableRates(alloc, zone.sqft) : 0,
         })
       }
     }
@@ -305,29 +322,45 @@ export default function TableView({ building, scenario, onUpdate, onUpdateScenar
   }, [sorted, sortKey])
 
   // Summary sqft tiles — always computed from all rows (not filtered)
+  // Lab is grouped with charitable for display purposes
   const sqftSummary = useMemo(() => {
-    let commercialLet = 0, commercialVacant = 0
-    let community = 0, communityOOU = 0
+    let commercialLet = 0, commercialLetRevenue = 0
+    let commercialVacant = 0, commercialVacantRevenue = 0
+    let community = 0, communityOOU = 0, communityRevenue = 0
     let shared = 0, sharedOOU = 0
+    let charitable = 0, charitableOOU = 0  // includes lab
 
     for (const r of rows) {
       const s = r.sqft ?? 0
       if (r.useType === 'commercial') {
-        if (r.status === 'let') commercialLet += s
+        if (r.status === 'let') { commercialLet += s; commercialLetRevenue += r.annualRevenue }
         else if (r.status === 'partially-let') {
           const pct = (r.letPercentage ?? 0) / 100
           commercialLet += s * pct
+          commercialLetRevenue += r.annualRevenue
           commercialVacant += s * (1 - pct)
-        } else if (r.status === 'vacant' || r.status === 'refurb') commercialVacant += s
+          commercialVacantRevenue += r.potentialRevenue
+        } else if (r.status === 'vacant' || r.status === 'refurb') {
+          commercialVacant += s
+          commercialVacantRevenue += r.potentialRevenue
+        }
       } else if (r.useType === 'community') {
         if (r.status === 'out-of-use') communityOOU += s
-        else community += s
-      } else if (r.useType === 'shared' || r.useType === 'lab') {
+        else { community += s; communityRevenue += r.annualRevenue }
+      } else if (r.useType === 'shared') {
         if (r.status === 'out-of-use') sharedOOU += s
         else shared += s
+      } else if (r.useType === 'lab' || r.useType === 'charitable') {
+        if (r.status === 'out-of-use') charitableOOU += s
+        else charitable += s
       }
     }
-    return { commercialLet, commercialVacant, community, communityOOU, shared, sharedOOU }
+    return {
+      commercialLet, commercialLetRevenue,
+      commercialVacant, commercialVacantRevenue,
+      community, communityOOU, communityRevenue,
+      shared, sharedOOU, charitable, charitableOOU,
+    }
   }, [rows])
 
   const grandTotals = useMemo(() => ({
@@ -337,6 +370,7 @@ export default function TableView({ building, scenario, onUpdate, onUpdateScenar
     commercialCost: sorted.reduce((s, r) => s + r.commercialCost, 0) + (scenario.miscCost ?? 0),
     vacantRates: sorted.reduce((s, r) => s + r.vacantRates, 0),
     communityCost: sorted.reduce((s, r) => s + r.communityCost, 0),
+    charitableRates: sorted.reduce((s, r) => s + r.charitableRates, 0),
   }), [sorted, scenario.miscRevenue, scenario.miscCost])
 
   const thCls = 'px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-wider text-white cursor-pointer select-none hover:bg-white/10 transition-colors whitespace-nowrap'
@@ -399,12 +433,12 @@ export default function TableView({ building, scenario, onUpdate, onUpdateScenar
       {/* Area — editable number */}
       <td className={tdNumCls}>
         <NumCell
-          value={row.sqft}
+          value={areaConvert(row.sqft, unit)}
           zoneId={row.zoneId}
           field="sqft"
           editing={isEditing(row.zoneId, 'sqft')}
           onStartEdit={() => startEdit(row.zoneId, 'sqft')}
-          onCommit={(v) => commit(row, 'sqft', v)}
+          onCommit={(v) => commit(row, 'sqft', areaRevert(v, unit))}
           onCancel={cancelEdit}
           placeholder="—"
         />
@@ -460,12 +494,12 @@ export default function TableView({ building, scenario, onUpdate, onUpdateScenar
       <td className={tdNumCls}>
         {row.useType === 'commercial' ? (
           <NumCell
-            value={row.rentPerSqft}
+            value={rateConvert(row.rentPerSqft, unit)}
             zoneId={row.zoneId}
             field="rentPerSqft"
             editing={isEditing(row.zoneId, 'rentPerSqft')}
             onStartEdit={() => startEdit(row.zoneId, 'rentPerSqft')}
-            onCommit={(v) => commit(row, 'rentPerSqft', v)}
+            onCommit={(v) => commit(row, 'rentPerSqft', rateRevert(v, unit))}
             onCancel={cancelEdit}
           />
         ) : <span className="text-stone-200">—</span>}
@@ -490,12 +524,12 @@ export default function TableView({ building, scenario, onUpdate, onUpdateScenar
       <td className={tdNumCls}>
         {row.useType !== 'unassigned' ? (
           <NumCell
-            value={row.councilTaxPerSqft}
+            value={rateConvert(row.councilTaxPerSqft, unit)}
             zoneId={row.zoneId}
             field="councilTaxPerSqft"
             editing={isEditing(row.zoneId, 'councilTaxPerSqft')}
             onStartEdit={() => startEdit(row.zoneId, 'councilTaxPerSqft')}
-            onCommit={(v) => commit(row, 'councilTaxPerSqft', v ?? 22)}
+            onCommit={(v) => commit(row, 'councilTaxPerSqft', rateRevert(v, unit) ?? 22)}
             onCancel={cancelEdit}
           />
         ) : <span className="text-stone-200">—</span>}
@@ -551,10 +585,11 @@ export default function TableView({ building, scenario, onUpdate, onUpdateScenar
     const commCostTotal = rows.reduce((s, r) => s + r.commercialCost, 0)
     const vacantRatesTotal = rows.reduce((s, r) => s + r.vacantRates, 0)
     const communityTotal = rows.reduce((s, r) => s + r.communityCost, 0)
+    const charitableTotal = rows.reduce((s, r) => s + r.charitableRates, 0)
     return (
       <tr style={{ background: '#f0efe9', borderTop: '1px solid #e7e3dc', borderBottom: '1px solid #e7e3dc' }}>
         <td className={tdCls + ' font-semibold text-stone-600'} colSpan={2}>Subtotal</td>
-        <td className={tdNumCls + ' font-semibold text-stone-700'}>{sqftTotal > 0 ? sqftTotal.toLocaleString() : '—'}</td>
+        <td className={tdNumCls + ' font-semibold text-stone-700'}>{sqftTotal > 0 ? Math.round(areaConvert(sqftTotal, unit)!).toLocaleString() : '—'}</td>
         <td colSpan={6} />
         <td className={tdNumCls + ' font-semibold text-stone-700'}>{revTotal > 0 ? fmt(revTotal) : '—'}</td>
         <td className={tdNumCls + ' font-semibold'} style={{ color: potentialTotal > 0 ? '#f59e0b' : undefined }}>
@@ -568,7 +603,14 @@ export default function TableView({ building, scenario, onUpdate, onUpdateScenar
             </div>
           )}
         </td>
-        <td className={tdNumCls + ' font-semibold text-stone-700'}>{communityTotal > 0 ? fmt(communityTotal) : '—'}</td>
+        <td className={tdNumCls + ' font-semibold text-stone-700'}>
+          {communityTotal > 0 ? fmt(communityTotal) : '—'}
+          {charitableTotal > 0 && (
+            <div className="text-[10px] font-normal" style={{ color: '#15803d' }}>
+              inc. {fmt(charitableTotal)} charitable rates
+            </div>
+          )}
+        </td>
       </tr>
     )
   }
@@ -599,58 +641,88 @@ export default function TableView({ building, scenario, onUpdate, onUpdateScenar
         <span className="ml-auto text-[10px] text-stone-400">
           Click any cell to edit · Click column header to sort
         </span>
+        <div className="flex items-center rounded-md overflow-hidden border border-stone-200" style={{ fontSize: 11 }}>
+          {(['sqft', 'sqm'] as AreaUnit[]).map((u) => (
+            <button
+              key={u}
+              onClick={() => setUnit(u)}
+              className="px-2 py-0.5 font-medium transition-colors"
+              style={unit === u
+                ? { background: '#111110', color: '#fff' }
+                : { background: '#f5f4f0', color: '#57534e' }}
+            >
+              {u === 'sqft' ? 'sq ft' : 'sq m'}
+            </button>
+          ))}
+        </div>
         <span className="text-xs text-stone-400">{sorted.length} zones</span>
       </div>
 
       {/* Sqft summary strip */}
       <div className="flex items-stretch gap-px shrink-0" style={{ background: '#e7e3dc' }}>
-        {[
-          {
-            label: 'Commercial Let',
-            sqft: sqftSummary.commercialLet,
-            color: '#1d4ed8',
-            bg: '#eff6ff',
-          },
-          {
-            label: 'Commercial Vacant',
-            sqft: sqftSummary.commercialVacant,
-            color: '#93c5fd',
-            bg: '#f8faff',
-          },
-          {
-            label: 'Community',
-            sqft: sqftSummary.community,
-            oou: sqftSummary.communityOOU,
-            color: '#dc2626',
-            bg: '#fff5f5',
-          },
-          {
-            label: 'Shared',
-            sqft: sqftSummary.shared,
-            oou: sqftSummary.sharedOOU,
-            color: '#64748b',
-            bg: '#f8f9fb',
-          },
-        ].map(({ label, sqft, oou, color, bg }) => (
-          <div
-            key={label}
-            className="flex-1 px-4 py-3"
-            style={{ background: bg, borderBottom: `2px solid ${color}` }}
-          >
-            <div className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color }}>
-              {label}
-            </div>
-            <div className="text-lg font-bold tabular-nums" style={{ color: '#111110' }}>
-              {Math.round(sqft).toLocaleString()}
-              <span className="text-xs font-normal text-stone-400 ml-1">sq ft</span>
-            </div>
-            {oou != null && oou > 0 && (
-              <div className="text-[10px] text-stone-400 mt-0.5">
-                +{Math.round(oou).toLocaleString()} sq ft out of use
-              </div>
-            )}
+        {/* Commercial Let */}
+        <div className="flex-1 px-4 py-3" style={{ background: '#eff6ff', borderBottom: '2px solid #1d4ed8' }}>
+          <div className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: '#1d4ed8' }}>Commercial Let</div>
+          <div className="text-lg font-bold tabular-nums" style={{ color: '#111110' }}>
+            {Math.round(areaConvert(sqftSummary.commercialLet, unit)!).toLocaleString()}
+            <span className="text-xs font-normal text-stone-400 ml-1">{unitLabel}</span>
           </div>
-        ))}
+          {sqftSummary.commercialLetRevenue > 0 && (
+            <div className="text-xs font-semibold tabular-nums mt-0.5" style={{ color: '#1d4ed8' }}>
+              {fmt(sqftSummary.commercialLetRevenue)}<span className="text-[10px] font-normal text-stone-400 ml-1">/yr</span>
+            </div>
+          )}
+        </div>
+
+        {/* Commercial Vacant */}
+        <div className="flex-1 px-4 py-3" style={{ background: '#f8faff', borderBottom: '2px solid #93c5fd' }}>
+          <div className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: '#93c5fd' }}>Commercial Vacant</div>
+          <div className="text-lg font-bold tabular-nums" style={{ color: '#111110' }}>
+            {Math.round(areaConvert(sqftSummary.commercialVacant, unit)!).toLocaleString()}
+            <span className="text-xs font-normal text-stone-400 ml-1">{unitLabel}</span>
+          </div>
+          {sqftSummary.commercialVacantRevenue > 0 && (
+            <div className="text-xs font-semibold tabular-nums mt-0.5" style={{ color: '#f59e0b' }}>
+              {fmt(sqftSummary.commercialVacantRevenue)}<span className="text-[10px] font-normal text-stone-400 ml-1">potential</span>
+            </div>
+          )}
+        </div>
+
+        {/* Community */}
+        <div className="flex-1 px-4 py-3" style={{ background: '#fff5f5', borderBottom: '2px solid #dc2626' }}>
+          <div className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: '#dc2626' }}>Community</div>
+          <div className="text-lg font-bold tabular-nums" style={{ color: '#111110' }}>
+            {Math.round(areaConvert(sqftSummary.community, unit)!).toLocaleString()}
+            <span className="text-xs font-normal text-stone-400 ml-1">{unitLabel}</span>
+          </div>
+          {sqftSummary.communityRevenue > 0 && (
+            <div className="text-xs font-semibold tabular-nums mt-0.5" style={{ color: '#dc2626' }}>
+              {fmt(sqftSummary.communityRevenue)}<span className="text-[10px] font-normal text-stone-400 ml-1">/yr</span>
+            </div>
+          )}
+          {sqftSummary.communityOOU > 0 && (
+            <div className="text-[10px] text-stone-400 mt-0.5">+{Math.round(areaConvert(sqftSummary.communityOOU, unit)!).toLocaleString()} out of use</div>
+          )}
+        </div>
+
+        {/* Shared (includes charitable + lab as sub-note) */}
+        <div className="flex-1 px-4 py-3" style={{ background: '#f8f9fb', borderBottom: '2px solid #64748b' }}>
+          <div className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: '#64748b' }}>Shared</div>
+          <div className="text-lg font-bold tabular-nums" style={{ color: '#111110' }}>
+            {Math.round(areaConvert(sqftSummary.shared + sqftSummary.charitable, unit)!).toLocaleString()}
+            <span className="text-xs font-normal text-stone-400 ml-1">{unitLabel}</span>
+          </div>
+          {sqftSummary.charitable > 0 && (
+            <div className="text-[10px] font-semibold mt-0.5" style={{ color: '#15803d' }}>
+              inc. {Math.round(areaConvert(sqftSummary.charitable, unit)!).toLocaleString()} {unitLabel} "charitable"
+            </div>
+          )}
+          {(sqftSummary.sharedOOU + sqftSummary.charitableOOU) > 0 && (
+            <div className="text-[10px] text-stone-400 mt-0.5">
+              +{Math.round(areaConvert(sqftSummary.sharedOOU + sqftSummary.charitableOOU, unit)!).toLocaleString()} out of use
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Table */}
@@ -660,12 +732,12 @@ export default function TableView({ building, scenario, onUpdate, onUpdateScenar
             <tr style={{ background: '#111110', position: 'sticky', top: 0, zIndex: 10 }}>
               <th className={thCls} onClick={() => handleSort('floorLabel')}>Floor <SortIndicator col="floorLabel" /></th>
               <th className={thCls} onClick={() => handleSort('zoneName')}>Zone Name <SortIndicator col="zoneName" /></th>
-              <th className={thNumCls} onClick={() => handleSort('sqft')}>Area (sq ft) <SortIndicator col="sqft" /></th>
+              <th className={thNumCls} onClick={() => handleSort('sqft')}>Area ({unitLabel}) <SortIndicator col="sqft" /></th>
               <th className={thCls} onClick={() => handleSort('useType')}>Use Type <SortIndicator col="useType" /></th>
               <th className={thCls} onClick={() => handleSort('status')}>Status <SortIndicator col="status" /></th>
-              <th className={thNumCls} onClick={() => handleSort('rentPerSqft')}>Rent (£/sqft/yr) <SortIndicator col="rentPerSqft" /></th>
+              <th className={thNumCls} onClick={() => handleSort('rentPerSqft')}>Rent (£/{unitRateLabel}/yr) <SortIndicator col="rentPerSqft" /></th>
               <th className={thNumCls} onClick={() => handleSort('memberCount')}>Members <SortIndicator col="memberCount" /></th>
-              <th className={thNumCls} onClick={() => handleSort('councilTaxPerSqft')}>Rates (£/sqft/yr) <SortIndicator col="councilTaxPerSqft" /></th>
+              <th className={thNumCls} onClick={() => handleSort('councilTaxPerSqft')}>Rates (£/{unitRateLabel}/yr) <SortIndicator col="councilTaxPerSqft" /></th>
               <th className={thNumCls} onClick={() => handleSort('energyCost')}>Energy (£/yr) <SortIndicator col="energyCost" /></th>
               <th className={thNumCls} onClick={() => handleSort('annualRevenue')}>Annual Revenue <SortIndicator col="annualRevenue" /></th>
               <th className={thNumCls} onClick={() => handleSort('potentialRevenue')} style={{ color: '#fcd34d' }}>Potential Rev <SortIndicator col="potentialRevenue" /></th>
@@ -725,7 +797,7 @@ export default function TableView({ building, scenario, onUpdate, onUpdateScenar
             </tr>
             <tr style={{ background: '#e8e6e0', borderTop: '2px solid #d6d3cb' }}>
               <td className={tdCls + ' font-bold text-stone-900'} colSpan={2}>Grand Total</td>
-              <td className={tdNumCls + ' font-bold text-stone-900'}>{grandTotals.sqft > 0 ? grandTotals.sqft.toLocaleString() : '—'}</td>
+              <td className={tdNumCls + ' font-bold text-stone-900'}>{grandTotals.sqft > 0 ? Math.round(areaConvert(grandTotals.sqft, unit)!).toLocaleString() : '—'}</td>
               <td colSpan={6} />
               <td className={tdNumCls + ' font-bold text-stone-900'}>{fmt(grandTotals.annualRevenue)}</td>
               <td className={tdNumCls + ' font-bold'} style={{ color: grandTotals.potentialRevenue > 0 ? '#d97706' : '#292524' }}>
@@ -739,7 +811,14 @@ export default function TableView({ building, scenario, onUpdate, onUpdateScenar
                   </div>
                 )}
               </td>
-              <td className={tdNumCls + ' font-bold text-stone-900'}>{fmt(grandTotals.communityCost)}</td>
+              <td className={tdNumCls + ' font-bold text-stone-900'}>
+                {fmt(grandTotals.communityCost)}
+                {grandTotals.charitableRates > 0 && (
+                  <div className="text-[10px] font-normal" style={{ color: '#15803d' }}>
+                    inc. {fmt(grandTotals.charitableRates)} "charitable" rates
+                  </div>
+                )}
+              </td>
             </tr>
           </tbody>
         </table>

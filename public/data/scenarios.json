@@ -7,8 +7,8 @@
       {
         "floorId": "ground",
         "zoneId": "zone-ground-1773435053066",
-        "useType": "shared",
-        "color": "#64748b",
+        "useType": "charitable",
+        "color": "#15803d",
         "status": "shared",
         "teams": [],
         "sectors": [],
@@ -31,9 +31,9 @@
       {
         "floorId": "first",
         "zoneId": "zone-first-1773437218125",
-        "useType": "commercial",
-        "color": "#1d4ed8",
-        "status": "partially-let",
+        "useType": "charitable",
+        "color": "#15803d",
+        "status": "shared",
         "letPercentage": 30,
         "teams": [
           "K&G Recruitment"
@@ -211,7 +211,7 @@
         "floorId": "fifth",
         "zoneId": "zone-fifth-1773438502046",
         "useType": "community",
-        "color": "#1d4ed8",
+        "color": "#dc2626",
         "status": "out-of-use",
         "teams": [],
         "sectors": [],
@@ -267,7 +267,7 @@
         "floorId": "fifth",
         "zoneId": "zone-fifth-1773438554968",
         "useType": "community",
-        "color": "#1d4ed8",
+        "color": "#dc2626",
         "status": "out-of-use",
         "teams": [],
         "sectors": [],
@@ -295,7 +295,7 @@
         "zoneId": "zone-third-1773438637346",
         "useType": "lab",
         "color": "#059669",
-        "status": "vacant",
+        "status": "shared",
         "teams": [],
         "sectors": [],
         "councilTaxPerSqft": 22,
@@ -307,7 +307,7 @@
         "zoneId": "zone-fourth-1773438637346",
         "useType": "lab",
         "color": "#059669",
-        "status": "vacant",
+        "status": "shared",
         "teams": [],
         "sectors": [],
         "councilTaxPerSqft": 22,
@@ -318,7 +318,7 @@
         "floorId": "fifth",
         "zoneId": "zone-fifth-1773438637346",
         "useType": "community",
-        "color": "#64748b",
+        "color": "#dc2626",
         "status": "out-of-use",
         "teams": [],
         "sectors": [],
@@ -541,7 +541,9 @@
         "useType": "shared",
         "color": "#64748b",
         "teams": [],
-        "fundingModel": "",
+        "sectors": [],
+        "councilTaxPerSqft": 10,
+        "energyCost": 0,
         "notes": ""
       },
       {
@@ -550,7 +552,9 @@
         "useType": "shared",
         "color": "#64748b",
         "teams": [],
-        "fundingModel": "",
+        "sectors": [],
+        "councilTaxPerSqft": 10,
+        "energyCost": 0,
         "notes": ""
       },
       {
@@ -559,7 +563,9 @@
         "useType": "shared",
         "color": "#64748b",
         "teams": [],
-        "fundingModel": "",
+        "sectors": [],
+        "councilTaxPerSqft": 10,
+        "energyCost": 0,
         "notes": ""
       },
       {
@@ -781,11 +787,14 @@
       {
         "floorId": "first",
         "zoneId": "zone-first-1773437381324",
-        "useType": "shared",
-        "color": "#64748b",
-        "status": "shared",
-        "teams": [],
+        "useType": "commercial",
+        "color": "#1d4ed8",
+        "status": "let",
+        "teams": [
+          "K&G Recruitment"
+        ],
         "sectors": [],
+        "rentPerSqft": 42,
         "councilTaxPerSqft": 22,
         "energyCost": 0,
         "notes": "FT / Coworking"
@@ -806,7 +815,7 @@
         "floorId": "second",
         "zoneId": "zone-second-1773437968987",
         "useType": "shared",
-        "color": "transparent",
+        "color": "#64748b",
         "status": "out-of-use",
         "teams": [],
         "sectors": [],
