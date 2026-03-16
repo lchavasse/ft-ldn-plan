@@ -1,22 +1,21 @@
 import { NextResponse } from 'next/server'
-import * as fs from 'fs'
-import * as path from 'path'
+import { Redis } from '@upstash/redis'
 
-const DATA_PATH = path.join(process.cwd(), 'public/data/building.json')
+const redis = Redis.fromEnv()
 
 export async function GET() {
   try {
-    const data = fs.readFileSync(DATA_PATH, 'utf-8')
-    return NextResponse.json(JSON.parse(data))
-  } catch {
-    return NextResponse.json({ floors: [] })
+    const data = await redis.get('building')
+    return NextResponse.json(data ?? { floors: [] })
+  } catch (e) {
+    return NextResponse.json({ error: String(e) }, { status: 500 })
   }
 }
 
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    fs.writeFileSync(DATA_PATH, JSON.stringify(body, null, 2))
+    await redis.set('building', body)
     return NextResponse.json({ ok: true })
   } catch (e) {
     return NextResponse.json({ error: String(e) }, { status: 500 })
